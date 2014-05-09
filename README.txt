@@ -1,6 +1,5 @@
-
-Script Documentation
 ====================
+Script Documentation
 ====================
 This README contains information about what is contained in each script file, what
 it does, and how to call/use the function.
