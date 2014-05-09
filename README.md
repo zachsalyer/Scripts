@@ -1,21 +1,20 @@
 
 Script Documentation
 ====================
-====================
 This README contains information about what is contained in each script file, what
 it does, and how to call/use the function.
 
-Data Analysis Scripts
-=====================
+##Data Analysis Scripts
 These scripts are meant to be used with log files created by the CANCorder.
 
 ***IMPORTANT NOTE***
+
 Many of these scripts rely on the dictionary variable returned by file_to_variables
 to be called "dict". See file_to_variables example on proper procedure for obtaining
 this variable.
 
 	Python Scripts
-		- file_to_variables.py
+		file_to_variables.py
 			Contains a single function which takes in a log file in .csv format 
 			(Specifically CANCorder CSV file which has an extra comma after the 
 			last entry in a row) and outputs the data in the file in a dictionary
@@ -31,8 +30,8 @@ this variable.
 			data for the log. This error is based off the times between rows. The
 			higher the error, the higher the data loss or data not recorded/missed
 		
-		- plot_tritium.py
-		
+		plot_tritium.py
+	
 			Contains a single function which plots data over top of errors and
 			limits found in the dictionary file passed in as an input. This
 			function has a lot of flexibility. It has the capability of plotting
@@ -64,54 +63,56 @@ this variable.
 			and a scale you want to perform on each XY pair passed.
 			We are plotting Runtime vs. MotorVelocity and MotorTemp and inverting the
 			Runtime vs. MotorVelocity line that is plotted.
-			
-		- datalogging_delays.py
+		
+		datalogging_delays.py
 			Plots the difference in runtime values between each row in the log file.
 			
-		- gps_location.py
+		gps_location.py
 			3D plot of where the motorcycle travelled. VERY NEAT IF GPS DOESN'T DROP.
 			
-		- heartbeats.py
+		heartbeats.py
 			Quick method of determining if any of the CAN nodes dropped off the bus.
 			If all the heartbeats stop rising at once, that means the CANCorder dropped
 			off the bus and did not put itself back on.
 		
-		- polinas_script.py
+		polinas_script.py
 			Script made for the plot that Polina always wanted to see during testing.
 			Plots MotorTemp as blue, Power as red, MotorVelocity as green.
 			
-		- rpm_current.py
+		rpm_current.py
 			Plots runtime vs MotorVelocity and throttle input using tritium_plot. As a
 			note, the legend may get in the way due to how the data is passed in. Requires
 			the keys passed from file_to_variables to be named "headers"
 			
-		- runtime_heartbeat.py
+		runtime_heartbeat.py
 			Better script to use to determine if the heartbeats stopped for any CAN nodes.
 			Graphs times vs heartbeats so that the exact drop time can be seen.
 			
-		- scoop_pressure.py
+		scoop_pressure.py
 			A script which plots the pressure in the motor scoop and the current motor
 			velocity.
 			
-		- thermal_limit.py
+		thermal_limit.py
 			Used to determine if there was a thermal limit and at what motor speed and
 			temp. Uses samples instead of runtime since there is a slight offset when
 			using runtime as X.
 		
-		- Fit_to_model_demo.py
+		Fit_to_model_demo.py
 			Simply a demo showing how the curve_fit function works.
 			
-		- Aero_model.py
+		Aero_model.py
 			Script that displays the aero model for a run.
 			
-		- thermal_model.py
+		thermal_model.py
 			Displays the thermal model for a particular run or multiple runs.
+	
 	MATLAB Scripts
 	These scripts currently may or may not work due to issues with MATLAB reading in large
 	CSV files.
-		- file_to_variables.m
+	
+		file_to_variables.m
 			Identical to the Python script.
 			
-		- plot_tritium.m
+		plot_tritium.m
 			Identical to the Python script.
 			
