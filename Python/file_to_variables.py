@@ -29,33 +29,31 @@ def file_to_variables(f):
     dictionary = collections.OrderedDict()
     with open(f) as infile:
         for line in infile:
+            # if CANCorder log, there is an exact ','. Remove that entry
             dataList = line.split(",")
+            if dataList[-1] == '\n':
+                del dataList[-1]
+                
             if headersParsed == 0:
                 elementsPerRow = np.shape(dataList)[0]
-                for header in dataList[:-1]:
-                    """Add header to dictionary with empty list"""
-                    if "\n" in header:
-                        pass
-                    else:
-                        key = header.split()[0]
-                        dictionary.setdefault(key, []);
+                for header in dataList[:]:
+                    # Add header to dictionary with empty list
+                    key = header.split()[0]
+                    dictionary.setdefault(key, []);
                 dict_keys = dictionary.keys()
                 headersParsed = 1
             else:
-                """ Check to make sure the current line isn't missing a value """
+                # Check to make sure the current line isn't missing a value
                 if (np.shape(dataList)[0] == elementsPerRow):    
                     currentKey = 0;
-                    for data in dataList[:-1]:
-                        if "\n" in data:
-                            pass
-                        else:
-                            try:
-                                value = data.rstrip();
-                                dictionary[dict_keys[currentKey]].append(value)
-                            except:
-                                dictionary[dict_keys[currentKey]].append(data.strip())
-                                
-                            currentKey += 1;
+                    for data in dataList[:]:
+                        try:
+                            value = data.rstrip();
+                            dictionary[dict_keys[currentKey]].append(value)
+                        except:
+                            dictionary[dict_keys[currentKey]].append(data.strip())
+                            
+                        currentKey += 1;
                                     
     currentKey = 0
     for value in dictionary.itervalues():
@@ -67,10 +65,12 @@ def file_to_variables(f):
 
         currentKey += 1
     
-    runtime = dictionary['Runtime']
-    diff = np.diff(runtime)
-    average = np.average(diff)
-    print "Average datalog interval: " + np.str(average)
-    print "Datalogging error: " + np.str(np.round((average/(1.0/3.0)) * 100.0, 3)) + "%"
+    # Print log statistics if CANCorder log.
+    if 'Runtime' in dictionary:
+        runtime = dictionary['Runtime']
+        diff = np.diff(runtime)
+        average = np.average(diff)
+        print "Average datalog interval: " + np.str(average)
+        print "Datalogging error: " + np.str(np.round((average/(1.0/3.0)) * 100.0, 3)) + "%"
     
     return (dict_keys, dictionary)
