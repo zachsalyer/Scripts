@@ -15,9 +15,8 @@ this variable.
 
 	Python Scripts
 		- file_to_variables.py
-			Contains a single function which takes in a log file in .csv format 
-			(Specifically CANCorder CSV file which has an extra comma after the 
-			last entry in a row) and outputs the data in the file in a dictionary
+			Contains a single function which takes in a log file in .csv format
+			and outputs the data in the file in a dictionary
 			along with a array of possible keys for the dictionary
 			
 			Example 
@@ -27,8 +26,9 @@ this variable.
 				To view MotorTemp data in this case: dict['MotorTemp']
 				
 			This function will also output information involving the error in
-			data for the log. This error is based off the times between rows. The
-			higher the error, the higher the data loss or data not recorded/missed
+			data for the log if it's from the CANCorder. This error is based off the
+			times between rows. The higher the error, the higher the data loss or data 
+			not recorded/missed
 		
 		- plot_tritium.py
 		
