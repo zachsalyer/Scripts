@@ -88,6 +88,7 @@ for n in range(steps):
     pressure_1[n+1] = sea_level_pressure * (1 - (temp_lapse_rate*(altitude_1[n+1]/1000)/(sea_level_temp+273.15))) ** ((gravity*28.9644)/(8.31432*temp_lapse_rate))
     air_density_1[n+1] = (pressure_1[n+1] * 28.9644) / (8.31432 * (ambient_temp_1[n+1]+273.15) * 1000)
 
+print air_density_1[0][0]
 print 'Air density (Sean): ' + str(air_density_1[n+1][0])
 
 # JOHNS METHOD
@@ -103,6 +104,7 @@ ambient_temp_2[0] = ((sea_level_temp+273.15) - temp_lapse_rate * (altitude_2[0]/
 pressure_2[0] = sea_level_pressure * (1 - (temp_lapse_rate*(altitude_2[0]/1000)/(sea_level_temp+273.15))) ** ((gravity*28.9644)/(8.31432*temp_lapse_rate))
 air_density_2[0] = (pressure_2[0] * 28.9644) / (8.31432 * (ambient_temp_2[0]+273.15) * 1000)
 temp_lapse_rate = -6.5/1000.0
+
 
 
 for n in range(steps):
@@ -122,7 +124,7 @@ print 'Percent difference: ' + str(percentDiff[0]) + '%\n\n'
 
 print "Percent difference from table: " + str((abs(air_density_0[-2][0] - air_density_2[-1][0])/(air_density_0[-2][0])) * 100) + "%"
     
-    
+
     
     
 # FULL ALTITUDE (0-11km) GENERNATION TEST (Not used but works)
