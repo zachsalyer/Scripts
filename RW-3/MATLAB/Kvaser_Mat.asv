@@ -1,12 +1,10 @@
 % Supply a mat file from the kvaser and this will create a new mat file
 % better structured to do analsys on.
-
-%% USER UPDATE THIS!
+clear
 file = '2015-01-06_airflow_test_001.mat';
+map = containers.Map;
 matname = 'test.mat';
 
-%% USER DON'T CHANGE THIS!
-map = containers.Map;
 varlist = whos('-file',file);
 
 [r,c] = size(varlist);
@@ -27,6 +25,4 @@ for i = [1:r]
     map(sig.name) = sig;
     headers{i} = sig.name;
 end
-
-save(matname,'headers','map');
 
