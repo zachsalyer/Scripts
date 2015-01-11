@@ -8,9 +8,9 @@ matname = 'test.mat';
 %% USER DON'T CHANGE THIS!
 map = containers.Map;
 varlist = whos('-file',file);
-
+clear headers
 [r,c] = size(varlist);
-
+headers{1} = '0';
 for i = [1:r]
     if(strcmp(varlist(i).name,'header')) 
         continue 
@@ -20,6 +20,16 @@ for i = [1:r]
     n = regexp(var.Channelname, '_\d*_', 'split');
     n = regexp(n{2}, '_\d*', 'split');
     sig.name = n{1};
+    check = 0;
+    while max(ismember(headers,sig.name))
+        if check == 0
+           sig.name = strcat(sig.name,'2');
+           check = 3;
+        else
+            sig.name(end) = check;
+            check = check + 1;
+        end
+    end
     sig.ts = timeseries(var.signals.values,var.time);
     sig.ts.Name = sig.name;
     sig.time = var.time;
