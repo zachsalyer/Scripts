@@ -12,10 +12,27 @@ function offset = sync_logfiles(ts1, ts2)
 	
 	% Offset them so they start at the same time. This is part of our total
 	% offset
-	offset = ts1.Time(1) - ts2.Time(1);
+	offset = ts1.Time(1) - ts2.Time(1)
 	
 	% Find the cross-correlation between the two timeseries.
 	[xc, lags] = xcorr(ts1.Data, ts2.Data);
-	[m,i] = max(xc);
-	offset = offset + lags(i)*precision;
+	[~,i] = max(xc);
+	offset = offset - lags(i)*precision;
+	
+	% DEBUG
+	% DEBUG
+	figure(5)
+	clf
+	subplot(211)
+	hold on
+	plot(ts1.Data, 'r')
+	plot(ts2.Data)
+	
+	subplot(212)
+	hold on;
+	plot(lags,xc(1:end))
+	hold off;
+	
+	lags(i)
+	lags(i)*precision
 end
