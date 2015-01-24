@@ -27,14 +27,15 @@ can_ts.Data = can_ts.Data*(-1);
 %% processing
 
 % do it
-[result, fit] = sync_logfiles( can_ts, dyno_ts )
+result = sync_logfiles( can_ts, dyno_ts )
 
 %TODO: check that the union is a significant proportion of the total data
 % size
 %% display results
  
 % update timeseries
-can_ts.Time = can_ts.Time + result;
+dyno_sync = dyno_ts;
+dyno_sync.Time = dyno_sync.Time + result;
 
 %% try to sync with xcorr
 [v1 v2] = synchronize( can_ts, dyno_ts, 'Uniform', 'Interval', 0.01 );
@@ -73,7 +74,7 @@ clf
 ax1 = subplot(211);
 hold on;
 plot(can_ts, 'r');
-plot(dyno_ts);
+plot(dyno_sync);
 legend('Tritium', 'Dyno');
 
 ax2 = subplot(212);
