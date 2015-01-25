@@ -8,6 +8,11 @@ matname = 'test.mat';
 %% USER DON'T CHANGE THIS!
 map = containers.Map;
 varlist = whos('-file',file);
+
+% Save the Kvaser start time (to write into timeseries)
+load(file, 'header');
+starttime = [header.startdate ' ' header.starttime];
+
 clear headers
 [r,c] = size(varlist);
 headers{1} = '0';
@@ -32,6 +37,7 @@ for i = [1:r]
     end
     sig.ts = timeseries(var.signals.values,var.time);
     sig.ts.Name = sig.name;
+	sig.ts.TimeInfo.StartDate = starttime; 
     sig.time = var.time;
     sig.value = var.signals.values;
     map(sig.name) = sig;
