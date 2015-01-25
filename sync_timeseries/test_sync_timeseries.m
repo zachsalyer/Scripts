@@ -27,7 +27,7 @@ can_ts.Data = can_ts.Data*(-1);
 %% processing
 
 % do it
-result = sync_logfiles( can_ts, dyno_ts )
+result = sync_timeseries( can_ts, dyno_ts );
 
 %% display results
  
