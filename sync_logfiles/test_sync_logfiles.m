@@ -29,58 +29,33 @@ can_ts.Data = can_ts.Data*(-1);
 % do it
 result = sync_logfiles( can_ts, dyno_ts )
 
-%TODO: check that the union is a significant proportion of the total data
-% size
 %% display results
  
 % update timeseries
 dyno_sync = dyno_ts;
 dyno_sync.Time = dyno_sync.Time + result;
 
-%% try to sync with xcorr
-[v1 v2] = synchronize( can_ts, dyno_ts, 'Uniform', 'Interval', 0.01 );
-
-[xc, lags] = xcorr(v1.Data, v2.Data);
-[m,i] = max(xc);
-offset = lags(i)*0.01;
-
-% new synchronized timeseries
-v1_sync = v1;
-v1_sync.Time = v1_sync.Time - offset;
-
-
-figure(2);
-clf
-
-% plot signals before
-subplot(311)
-hold on
-plot(v1, 'r');
-plot(v2);
-
-subplot(312)
-hold on;
-plot(lags,xc(1:end))
-
-subplot(313)
-hold on;
-plot(v1_sync, 'r');
-plot(v2)
-
-%% display actually
 figure(1);
 clf
 
 ax1 = subplot(211);
 hold on;
 plot(can_ts, 'r');
-plot(dyno_sync);
+plot(dyno_ts);
+title('Before sync')
+xlabel('Time (sec)');
 legend('Tritium', 'Dyno');
 
 ax2 = subplot(212);
-[t1 t2] = synchronize(can_ts, dyno_ts, 'Union', 'KeepOriginalTimes', false);
-plot( t2.Data-t1.Data);
+hold on;
+plot(can_ts, 'r');
+plot(dyno_sync);
+title('After sync')
+xlabel('Time (sec)');
+legend('Tritium', 'Dyno');
+
+text(max( max(can_ts.Time), max(dyno_sync.Time))/3, max(can_ts.Data)/2, ['Offset: ' num2str(result) ' sec'])
 
 hold off;
 
-%linkaxes([ax1,ax2],'x');
+linkaxes([ax1,ax2],'x');
