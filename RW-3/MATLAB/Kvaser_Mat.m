@@ -1,23 +1,15 @@
+function [ map, headers ] = Kvaser_Mat( Kvaser_MATfile )
+%Kvaser_Mat Convert Kvaser MATfile into timeseries
+%   This script reads the .mat files written by the Kvaser software.
+%
 % Supply a mat file from the kvaser and this will create a new mat file
 % better structured to do analsys on.
 
-%% USER UPDATE THIS!
-
-% Prompt
-[file, path] = uigetfile( 'mat', 'Select an input MATfile to convert' );
-matname = [ path file(1:end-4) '_Converted.mat' ];
-file = fullfile( path, file );
-
-% Hard-coded
-% file = '2015-01-06_airflow_test_001.mat';
-% matname = 'test.mat';
-
-%% USER DON'T CHANGE THIS!
 map = containers.Map;
-varlist = whos('-file',file);
+varlist = whos('-file', Kvaser_MATfile);
 
 % Save the Kvaser start time (to write into timeseries)
-load(file, 'header');
+load(Kvaser_MATfile, 'header');
 starttime = [header.startdate ' ' header.starttime];
 
 clear headers
@@ -27,7 +19,7 @@ for i = [1:r]
     if(strcmp(varlist(i).name,'header')) 
         continue 
     end
-    k = load(file,varlist(i).name);
+    k = load(Kvaser_MATfile,varlist(i).name);
     var = getfield(k,varlist(i).name);
     n = regexp(var.Channelname, '_\d*_', 'split');
     n = regexp(n{2}, '_\d*', 'split');
@@ -50,6 +42,4 @@ for i = [1:r]
     map(sig.name) = sig;
     headers{i} = sig.name;
 end
-
-save(matname,'headers','map');
 
