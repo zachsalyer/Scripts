@@ -7,8 +7,8 @@ function offset = sync_logfiles(ts1, ts2)
 	% Resample both timeseries to a suitably small timestep.
 	% Our WS200 log interval is 200 ms, so we will use 10 ms here.
 	precision = 0.01;	% second
-	ts1 = resample( ts1, 0:precision:range(ts1.Time) );
-	ts2 = resample( ts2, 0:precision:range(ts2.Time) );
+	ts1 = resample( ts1, min(ts1.Time):precision:max(ts1.Time));
+	ts2 = resample( ts2, min(ts2.Time):precision:max(ts2.Time));
 	
 	% Offset them so they start at the same time. This is part of our total
 	% offset
@@ -17,22 +17,5 @@ function offset = sync_logfiles(ts1, ts2)
 	% Find the cross-correlation between the two timeseries.
 	[xc, lags] = xcorr(ts1.Data, ts2.Data);
 	[~,i] = max(xc);
-	offset = offset - lags(i)*precision;
-	
-	% DEBUG
-	% DEBUG
-	figure(5)
-	clf
-	subplot(211)
-	hold on
-	plot(ts1.Data, 'r')
-	plot(ts2.Data)
-	
-	subplot(212)
-	hold on;
-	plot(lags,xc(1:end))
-	hold off;
-	
-	lags(i)
-	lags(i)*precision
+	offset = offset + lags(i)*precision;
 end
