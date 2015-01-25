@@ -1,4 +1,5 @@
-function offset = sync_logfiles(ts1, ts2)
+function offset = sync_timeseries(ts1, ts2)
+%sync_timeseries Determine offset between similar data in two timeseries
 	% This function returns the offset that should be APPLIED to ts2 in
 	% order to synchronize ts1 and ts2. 
 	% 
@@ -12,7 +13,7 @@ function offset = sync_logfiles(ts1, ts2)
 	
 	% Offset them so they start at the same time. This is part of our total
 	% offset
-	offset = ts1.Time(1) - ts2.Time(1)
+	offset = ts1.Time(1) - ts2.Time(1);
 	
 	% Find the cross-correlation between the two timeseries.
 	[xc, lags] = xcorr(ts1.Data, ts2.Data);
