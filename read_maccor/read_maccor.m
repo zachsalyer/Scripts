@@ -13,11 +13,14 @@ function [current, voltage, step] = read_maccor( logfile )
 file = fopen(logfile);
 StartDate = textscan( file, '%*s %s', 1, 'Delimiter', ',', 'HeaderLines',1);
 StartDate = StartDate{1};
+StartDate = StartDate(1);	% cell to string
 
 % Read the rest of the file
 % Header: Step,TestTime,StepTime,Amps,Volts,ACR
 % ACR appears not to be present so we will ignore it
 data = textscan( file, '%d %f %*f %f %f', 'Delimiter', ',', 'HeaderLines', 3);
+
+fclose( file );
 
 step = data{1};
 time = data{2};
