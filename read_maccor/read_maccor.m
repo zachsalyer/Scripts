@@ -12,8 +12,7 @@ function [current, voltage, step] = read_maccor( logfile )
 % Read start date from file. We expect it is on the second line.
 file = fopen(logfile);
 StartDate = textscan( file, '%*s %s', 1, 'Delimiter', ',', 'HeaderLines',1);
-StartDate = StartDate{1};
-StartDate = StartDate(1);	% cell to string
+StartDate = StartDate{1}{1};	% cell to string
 
 % Read the rest of the file
 % Header: Step,TestTime,StepTime,Amps,Volts,ACR
