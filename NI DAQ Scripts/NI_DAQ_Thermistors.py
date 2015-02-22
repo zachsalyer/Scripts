@@ -40,9 +40,9 @@ rpm_offset = 0.4
 torque_offset = 0.783
 
 
-csvfile = open('dyno_daq_log.csv', 'w+b')
+csvfile = open('thermistors_log.csv', 'w+b')
 writer = csv.writer(csvfile, delimiter=',')
-writer.writerow(['Time', 'RPM', 'Torque (Nm)'])
+writer.writerow(['Time', 'Temp1', 'Temp2', 'Temp3', 'Temp4', 'Temp5', 'Temp6', 'Temp7'])
 
 #data = np.zeros((sampleRate * inputChannels), dtype=numpy.float64)
 
@@ -55,8 +55,15 @@ def EveryNCallback_py(taskHandle, everyNsamplesEventType, nSamples, callbackData
     # DAQmx Read Code
     DAQmxReadAnalogF64(taskHandle,CANRate,timeout,DAQmx_Val_GroupByScanNumber,data,CANRate * inputChannels,byref(read),None)
     callbackdata.extend(data.tolist())    
+        
+    Rinf = 10000 * np.exp(-1*3380/298.15)
     
-    data[0] = (data[0] / (10.0/5000.0))# + rpm_offset
+    # A0, t1
+    Rth1 = data[0]*9370/(5-data[0])
+    
+    temp1 = (3380/np.log(Rth1/Rinf)) - 273.15
+    
+    #data[0] = (data[0] / (10.0/5000.0))# + rpm_offset
     # Send data over CAN..
     '''
     lowBytes = [ord(byte) for byte in struct.pack('!f', data[0])]
@@ -65,7 +72,32 @@ def EveryNCallback_py(taskHandle, everyNsamplesEventType, nSamples, callbackData
     msg[2] = lowBytes[1]
     msg[3] = lowBytes[0]
     '''
-    data[1] = (data[1] / 10.0 * (625)/1.66 * 1.356)# + torque_offset
+    #data[1] = (data[1] / 10.0 * (625)/1.66 * 1.356)# + torque_offset
+    
+    #A4, t2
+    Rth2 = data[4]*9360/(5-data[4])
+    temp2 = 3380/np.log(Rth2/Rinf) - 273.15  
+    print str(Rth2) + '\n'
+    print str(temp2) + '\n'
+    #A1, t3
+    Rth3 = data[1]*9350/(5-data[1])
+    temp3 = 3380/np.log(Rth3/Rinf) - 273.15
+    
+    #A5, t4
+    Rth4 = data[5]*9380/(5-data[5])
+    temp4 = 3380/np.log(Rth4/Rinf) - 273.15
+    
+    #A2, t5
+    Rth5 = data[2]*9310/(5-data[2])
+    temp5 = 3380/np.log(Rth5/Rinf) - 273.15
+    
+    #A6, t6
+    Rth6 = data[6]*9340/(5-data[6])
+    temp6 = 3380/np.log(Rth6/Rinf) - 273.15
+    
+    #A3, t7
+    Rth7 = data[3]*9230/(5-data[3])
+    temp7 = 3380/np.log(Rth7/Rinf) - 273.15
     
     '''
     highBytes = [ord(byte) for byte in struct.pack('!f', data[1])]
@@ -81,7 +113,7 @@ def EveryNCallback_py(taskHandle, everyNsamplesEventType, nSamples, callbackData
     #print time[-7]
     if time[-7] != '.':
         time += '.000000'
-    writer.writerow([time, data[0], data[1]])    
+    writer.writerow([time, temp1, temp2, temp3, temp4, temp5, temp6, temp7])    
     
     return 0 # The function should return an integer
 
@@ -148,14 +180,14 @@ try:
     DAQmxCreateTask("",byref(taskHandle))
     
     # By default, DynLocV will output a 0V to +10V signal. Connect outputs to inputs AI0 and AI1 on the DAQ.
-    DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai0","",DAQmx_Val_RSE,0.0,10.0,DAQmx_Val_Volts,None)
-    DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai1","",DAQmx_Val_RSE,0.0,10.0,DAQmx_Val_Volts,None)   
-    DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai2","",DAQmx_Val_RSE,0.0,10.0,DAQmx_Val_Volts,None)    
-    DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai3","",DAQmx_Val_RSE,0.0,10.0,DAQmx_Val_Volts,None)    
-    DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai4","",DAQmx_Val_RSE,0.0,10.0,DAQmx_Val_Volts,None)    
-    DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai5","",DAQmx_Val_RSE,0.0,10.0,DAQmx_Val_Volts,None)    
-    DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai6","",DAQmx_Val_RSE,0.0,10.0,DAQmx_Val_Volts,None)    
-    DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai7","",DAQmx_Val_RSE,0.0,10.0,DAQmx_Val_Volts,None)    
+    DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai0","",DAQmx_Val_RSE,0.0,5.0,DAQmx_Val_Volts,None)
+    DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai1","",DAQmx_Val_RSE,0.0,5.0,DAQmx_Val_Volts,None)   
+    DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai2","",DAQmx_Val_RSE,0.0,5.0,DAQmx_Val_Volts,None)    
+    DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai3","",DAQmx_Val_RSE,0.0,5.0,DAQmx_Val_Volts,None)    
+    DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai4","",DAQmx_Val_RSE,0.0,5.0,DAQmx_Val_Volts,None)    
+    DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai5","",DAQmx_Val_RSE,0.0,5.0,DAQmx_Val_Volts,None)    
+    DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai6","",DAQmx_Val_RSE,0.0,5.0,DAQmx_Val_Volts,None)    
+    DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai7","",DAQmx_Val_RSE,0.0,5.0,DAQmx_Val_Volts,None)    
 
     
     # Set Sampling Rate at 10000 samples/sec and sample continously until the task stops.
