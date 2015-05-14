@@ -125,6 +125,12 @@ t = [0:timediff:timediff*(size(Time1)-1)];
 
 
 % Make timeseries
+
+MotorSpeed                      = timeseries(Speed, t);
+MotorSpeed .DataInfo.Units      = 'RPM';
+MotorSpeed .Name                = 'Wt3000 Measured Dyno/Motor Speed';
+MotorSpeed .UserData            = logfile;
+
 pBCurrent	= timeseries(IE2, t);
 pBCurrent.DataInfo.Units		= 'Ampere RMS';
 pBCurrent.Name                    = 'Wt3000 Phase B Current';
