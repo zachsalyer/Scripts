@@ -1,0 +1,3 @@
+http://www.ni.com/download/ni-daqmx-14.2/5046/en/
+
+Python(x,y)
