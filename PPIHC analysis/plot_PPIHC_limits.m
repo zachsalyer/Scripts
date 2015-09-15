@@ -156,4 +156,51 @@ h(8).DisplayName	= 'Vehicle velocity';
 
 legend('show', 'Location', 'bestoutside');
 
+%% Plot component temperatures with derating limits
+
+% Battery derating 
+pack_derating_ramp		= 55;	% "ramp" setpoint temperature for battery temp controller
+pack_derating_cutoff		= 75;	% "cutoff" setpoint temp for ""
+
+% Motor derating
+motor_derating_ramp			= 105;	% "ramp" temperature, motor (??)
+motor_derating_cutoff		= 120;
+
+% Controller derating
+mc_derating_ramp			= 75;	% totally made up right now
+mc_derating_cutoff			= 85;	% totally made up right now
+
+figure(3); clf;
+
+% Motor temp
+ax1 = subplot(311); hold on;
+grid on;
+title('Motor temperature');
+plot(Powertrain.Motor.MotorTemp);
+plot([race_start_time race_end_time], [motor_derating_ramp motor_derating_ramp], 'r');
+
+ax1.YTick = motor_derating_ramp + (0:0.2:1).*(motor_derating_cutoff - motor_derating_ramp);
+ax1.YTickLabel = {'100%', '80%', '60%', '40%', '20%', '0%'};
+
+% Battery temp
+ax2 = subplot(312); hold on;
+grid on;
+title('Battery pack temperature');
+plot(Powertrain.Pack.MaxCellTemp);
+plot([race_start_time race_end_time], [pack_derating_ramp pack_derating_ramp], 'r');
+
+ax2.YTick = pack_derating_ramp + (0:0.2:1).*(pack_derating_cutoff - pack_derating_ramp);
+ax2.YTickLabel = {'100%', '80%', '60%', '40%', '20%', '0%'};
+
+% Controller temp
+ax3 = subplot(313); hold on;
+grid on;
+title('Motor controller temperature');
+plot(Powertrain.Controller.IPMPhaseATemp);
+ylabel('
+
+linkaxes([ax1 ax2 ax3], 'x');
+xlim([race_start_time race_end_time]);
+
+
 
