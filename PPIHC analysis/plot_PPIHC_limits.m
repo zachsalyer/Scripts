@@ -10,7 +10,13 @@ clear; clc; close all
 %load 'Race.mat';
 load 'PPIHC_15';			% re-structured race data
 
+% Race start and end time offsets, in seconds.
+race_start_time		= 166.9;
+race_end_time		= 680.6;	% note: this is not perfectly precise
+
 %% Construct limit timeseries
+TimeVector = Powertrain.Controller.LimitFlags.Time;
+
 CurrentLimit.Temperature			= timeseries((Powertrain.Controller.LimitFlags.Data == 2^6), Powertrain.Controller.LimitFlags.Time);
 CurrentLimit.BusVoltageLower		= timeseries((Powertrain.Controller.LimitFlags.Data == 2^5), Powertrain.Controller.LimitFlags.Time);
 CurrentLimit.BusVoltageUpper		= timeseries((Powertrain.Controller.LimitFlags.Data == 2^4), Powertrain.Controller.LimitFlags.Time);
@@ -28,29 +34,17 @@ CurrentLimit.BatteryTemperature.Data	= CurrentLimit.BatteryTemperature.Data & Cu
 % by throttle position) is only effective when the battery temperature limit
 % is not in effect.
 CurrentLimit.ThrottlePosition		= timeseries((Powertrain.Controller.LimitFlags.Data == 2^1), Powertrain.Controller.LimitFlags.Time);		% MotorCurrent
-CurrentLimit.ThrottlePosition.Data	= CurrentLimit.ThrottlePosition.Data & ~CurrentLimit.BatteryTemperature.Data;
-
-% Use a moving average to provide a better high-level view of the limit
-% behavior.
-span	= 10;					% moving average window length, sec
-span	= span/CommonTime.step;
-
-CurrentLimitAvg							= CurrentLimit;
-CurrentLimitAvg.Temperature.Data		= smooth(double(CurrentLimit.Temperature.Data), span);
-CurrentLimitAvg.BusVoltageLower.Data	= smooth(double(CurrentLimit.BusVoltageLower.Data), span);
-CurrentLimitAvg.BusVoltageUpper.Data	= smooth(double(CurrentLimit.BusVoltageUpper.Data), span);
-CurrentLimitAvg.BusCurrent.Data			= smooth(double(CurrentLimit.BusCurrent.Data), span);
-CurrentLimitAvg.Velocity.Data			= smooth(double(CurrentLimit.Velocity.Data), span);
-CurrentLimitAvg.ThrottlePosition.Data	= smooth(double(CurrentLimit.ThrottlePosition.Data), span);
-CurrentLimitAvg.OutputPWM.Data			= smooth(double(CurrentLimit.OutputPWM.Data), span);
-CurrentLimitAvg.BatteryTemperature.Data	= smooth(double(CurrentLimit.BatteryTemperature.Data), span);
-
+%CurrentLimit.ThrottlePosition.Data	= CurrentLimit.ThrottlePosition.Data & ~CurrentLimit.BatteryTemperature.Data;
 
 %% test plots
-race_start_index	= find( CommonTime.vector > 0, 1);
-race_end_index		= find( CommonTime.vector >= race_end_time, 1 );
+race_start_index	= find( TimeVector > 0, 1);
+race_end_index		= find( TimeVector >= race_end_time, 1 );
 
 figure(1); clf; hold on;
+
+ax2 = subplot(311); hold on;
+plot( Powertrain.Controller.LimitFlags.Data);
+
 ax1 = subplot(312); hold on;
 imagesc( ~[	CurrentLimit.Temperature.Data';			...
 			CurrentLimit.BusVoltageLower.Data';		...
@@ -77,12 +71,9 @@ ax.YTickLabel	= {	'Motor/MC temperature',	...
 ax.XTick		= [race_start_index race_end_index];
 ax.XTickLabel	= {'Race start', 'Race end'};
 
-ax2 = subplot(311); hold on;
-plot( BusVoltage.Data );
-
 ax3 = subplot(313); hold on;
-plot( MotorCurrentSetpoint.Data.*300, 'r' );
-plot( PhaseCurrentB.Data, 'b' );
+plot( Powertrain.Controller.MotorCurrentSetpoint.Data.*300, 'r' );
+plot( Powertrain.Motor.PhaseCurrentB.Data, 'b' );
 
 linkaxes( [ax1 ax2 ax3], 'x' );
 xlim([ race_start_index, race_end_index ]);
@@ -90,29 +81,64 @@ xlim([ race_start_index, race_end_index ]);
 				
 title( 'PPIHC - motor current limiting over time' );
 
-figure(2); clf; hold on;
-area( [		CurrentLimitAvg.Temperature.Data;			...
-			CurrentLimitAvg.BusVoltageLower.Data;		...
-			CurrentLimitAvg.BusVoltageUpper.Data;		...
-			CurrentLimitAvg.BusCurrent.Data;			...
-			CurrentLimitAvg.Velocity.Data;				...
-			CurrentLimitAvg.ThrottlePosition.Data;		...
-			CurrentLimitAvg.OutputPWM.Data;				...
-			CurrentLimitAvg.BatteryTemperature.Data ]);
+%% Stacked-area plot
 
+% Use a moving average to provide a better high-level view of the limit
+% behavior.
+span	= 20;					% moving average window length, sec
+span	= span/(TimeVector(2) - TimeVector(1));
+
+CurrentLimitAvg							= CurrentLimit;
+CurrentLimitAvg.Temperature.Data		= smooth(double(CurrentLimit.Temperature.Data), span);
+CurrentLimitAvg.BusVoltageLower.Data	= smooth(double(CurrentLimit.BusVoltageLower.Data), span);
+CurrentLimitAvg.BusVoltageUpper.Data	= smooth(double(CurrentLimit.BusVoltageUpper.Data), span);
+CurrentLimitAvg.BusCurrent.Data			= smooth(double(CurrentLimit.BusCurrent.Data), span);
+CurrentLimitAvg.Velocity.Data			= smooth(double(CurrentLimit.Velocity.Data), span);
+CurrentLimitAvg.ThrottlePosition.Data	= smooth(double(CurrentLimit.ThrottlePosition.Data), span);
+CurrentLimitAvg.OutputPWM.Data			= smooth(double(CurrentLimit.OutputPWM.Data), span);
+CurrentLimitAvg.BatteryTemperature.Data	= smooth(double(CurrentLimit.BatteryTemperature.Data), span);
+
+
+rows =  [	CurrentLimitAvg.ThrottlePosition.Data,		...
+			CurrentLimitAvg.Temperature.Data,			...
+			CurrentLimitAvg.BatteryTemperature.Data		...
+			CurrentLimitAvg.OutputPWM.Data,				...
+			CurrentLimitAvg.BusVoltageLower.Data,		...
+			CurrentLimitAvg.BusVoltageUpper.Data,		...
+			CurrentLimitAvg.BusCurrent.Data,			...
+			CurrentLimitAvg.Velocity.Data,				...
+			];
+		
+% Normalize so that each row sums up to 1
+normalized = bsxfun(@rdivide,rows,sum(rows,2));
+
+figure(2); clf; hold on;
+h = area( normalized, 'LineStyle', 'none');
+ylim([0 1]);
 xlim([ race_start_index, race_end_index ]);
 
-%% Compare the original and resampled data
+% Pretty colors
+h(1).FaceColor		= [110 235 131]/255;	% throttle = light green
+h(1).DisplayName	= 'Throttle position';
+
+h(2).FaceColor		= [254 95  85 ]/255;	% motor/controller temp = red
+h(2).DisplayName	= 'Motor/MC temperature';
+
+h(3).FaceColor		= [255 210 63]/255;		% battery temp = orange
+h(3).DisplayName	= 'Battery temperature';
+
+h(4).FaceColor		= [008 061 119]/255;	% PWM = dk blue
+h(4).DisplayName	= 'DC bus voltage (PWM)';
+
+h(5).FaceColor		= [27  231 255]/255;	% lower bus voltage = blue
+h(5).DisplayName	= 'Lower bus voltage limit';
+
+h(6).FaceColor		= [228 255 026]/255;	% upper bus voltage = yellow
+h(6).DisplayName	= 'Upper bus voltage limit';
+
+h(7).DisplayName	= 'Bus current';
+h(8).DisplayName	= 'Vehicle velocity';
+
+legend('show', 'Location', 'bestoutside');
 
 
-%% temp
-figure(3); clf; hold on;
-plot(CurrentLimitAvg.Temperature);
-plot(CurrentLimitAvg.ThrottlePosition);
-
-figure(4); clf; hold on;
-ax1 = subplot(211); plot(Odometer);
-ax2 = subplot(212); plot(VehicleVelocity);
-
-linkaxes([ax1 ax2],'x');
-xlim([race_start_time race_end_time+10]);
