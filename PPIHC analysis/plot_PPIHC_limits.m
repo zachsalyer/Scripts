@@ -11,7 +11,7 @@ clear; clc; close all
 load 'PPIHC_15';			% re-structured race data
 
 % Race start and end time offsets, in seconds.
-race_start_time		= 166.9;
+race_start_time		= 0;
 race_end_time		= 680.6;	% note: this is not perfectly precise
 
 %% Construct limit timeseries
@@ -109,13 +109,28 @@ rows =  [	CurrentLimitAvg.ThrottlePosition.Data,		...
 			CurrentLimitAvg.Velocity.Data,				...
 			];
 		
+times = [	CurrentLimitAvg.ThrottlePosition.Time,		...
+			CurrentLimitAvg.Temperature.Time,			...
+			CurrentLimitAvg.BatteryTemperature.Time		...
+			CurrentLimitAvg.OutputPWM.Time,				...
+			CurrentLimitAvg.BusVoltageLower.Time,		...
+			CurrentLimitAvg.BusVoltageUpper.Time,		...
+			CurrentLimitAvg.BusCurrent.Time,			...
+			CurrentLimitAvg.Velocity.Time,				...
+			];
+		
 % Normalize so that each row sums up to 1
 normalized = bsxfun(@rdivide,rows,sum(rows,2));
 
 figure(2); clf; hold on;
-h = area( normalized, 'LineStyle', 'none');
+h = area(times, normalized, 'LineStyle', 'none');
 ylim([0 1]);
-xlim([ race_start_index, race_end_index ]);
+xlim([ race_start_time, race_end_time ]);
+
+set(gca, 'ytick', []);		% Hide y-axis
+xlabel('Race time (sec)');
+
+title('Powertrain limits during PPIHC competition 2015');
 
 % Pretty colors
 h(1).FaceColor		= [110 235 131]/255;	% throttle = light green
