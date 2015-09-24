@@ -12,7 +12,7 @@ load 'PPIHC_15';			% re-structured race data
 
 % Race start and end time offsets, in seconds.
 race_start_time		= 0;
-race_end_time		= 680.6;	% note: this is not perfectly precise
+race_end_time		= 11*60 + 12.756;
 
 %% Construct limit timeseries
 TimeVector = Powertrain.Controller.LimitFlags.Time;
@@ -105,8 +105,6 @@ rows =  [	CurrentLimitAvg.ThrottlePosition.Data,		...
 			CurrentLimitAvg.OutputPWM.Data,				...
 			CurrentLimitAvg.BusVoltageLower.Data,		...
 			CurrentLimitAvg.BusVoltageUpper.Data,		...
-			CurrentLimitAvg.BusCurrent.Data,			...
-			CurrentLimitAvg.Velocity.Data,				...
 			];
 		
 times = [	CurrentLimitAvg.ThrottlePosition.Time,		...
@@ -115,8 +113,6 @@ times = [	CurrentLimitAvg.ThrottlePosition.Time,		...
 			CurrentLimitAvg.OutputPWM.Time,				...
 			CurrentLimitAvg.BusVoltageLower.Time,		...
 			CurrentLimitAvg.BusVoltageUpper.Time,		...
-			CurrentLimitAvg.BusCurrent.Time,			...
-			CurrentLimitAvg.Velocity.Time,				...
 			];
 		
 % Normalize so that each row sums up to 1
@@ -151,56 +147,131 @@ h(5).DisplayName	= 'Lower bus voltage limit';
 h(6).FaceColor		= [228 255 026]/255;	% upper bus voltage = yellow
 h(6).DisplayName	= 'Upper bus voltage limit';
 
-h(7).DisplayName	= 'Bus current';
-h(8).DisplayName	= 'Vehicle velocity';
-
 legend('show', 'Location', 'bestoutside');
 
 %% Plot component temperatures with derating limits
 
 % Battery derating 
-pack_derating_ramp		= 55;	% "ramp" setpoint temperature for battery temp controller
-pack_derating_cutoff		= 75;	% "cutoff" setpoint temp for ""
+pack_derating_ramp			= 55;	% "ramp" setpoint temperature for battery temp controller
+pack_derating_cutoff		= 70;	% "cutoff" setpoint temp for ""
 
 % Motor derating
-motor_derating_ramp			= 105;	% "ramp" temperature, motor (??)
+motor_derating_ramp			= 100;	% "ramp" temperature, motor (??)
 motor_derating_cutoff		= 120;
 
 % Controller derating
-mc_derating_ramp			= 75;	% totally made up right now
-mc_derating_cutoff			= 85;	% totally made up right now
+mc_derating_ramp			= 90;	% totally made up right now
+mc_derating_cutoff			= 100;	% totally made up right now
 
 figure(3); clf;
 
 % Motor temp
 ax1 = subplot(311); hold on;
 grid on;
-title('Motor temperature');
-plot(Powertrain.Motor.MotorTemp);
+
+% Fill area under curve where power is limited
+limit_start_index	= find(Powertrain.Motor.MotorTemp.Data > motor_derating_ramp, 1);
+limit_end_index		= find(Powertrain.Motor.MotorTemp.Data(limit_start_index:end) < motor_derating_ramp, 1);
+limit_end_index		= limit_end_index + limit_start_index;
+
+fill			= area(Powertrain.Motor.MotorTemp.Time(limit_start_index:limit_end_index), Powertrain.Motor.MotorTemp.Data(limit_start_index:limit_end_index), motor_derating_ramp);
+fill.EdgeColor	= 'none';
+fill.FaceColor	= [255 181 181]/255;
+%fill.FaceAlpha	= 0.2;
+
+plot(Powertrain.Motor.MotorTemp, 'LineWidth', 2);
 plot([race_start_time race_end_time], [motor_derating_ramp motor_derating_ramp], 'r');
 
-ax1.YTick = motor_derating_ramp + (0:0.2:1).*(motor_derating_cutoff - motor_derating_ramp);
-ax1.YTickLabel = {'100%', '80%', '60%', '40%', '20%', '0%'};
+ax1.YTick = motor_derating_ramp + (0:0.5:1).*(motor_derating_cutoff - motor_derating_ramp);
+ax1.YTickLabel = {'100%', '50%', '0%'};
+
+xlim([0 race_end_time]);
+xlabel('');
+ylabel('Motor power derating');
+
+title('Motor temperature');
 
 % Battery temp
+PackTemp_sm			= timeseries( smooth(Powertrain.Pack.MaxCellTemp.Data, 30), Powertrain.Pack.MaxCellTemp.Time );
+
 ax2 = subplot(312); hold on;
 grid on;
-title('Battery pack temperature');
-plot(Powertrain.Pack.MaxCellTemp);
+
+% Fill area under curve where power is limited
+limit_start_index	= find(PackTemp_sm.Data > pack_derating_ramp, 1);
+
+fill			= area(PackTemp_sm.Time(limit_start_index:end), PackTemp_sm.Data(limit_start_index:end), pack_derating_ramp);
+fill.EdgeColor	= 'none';
+fill.FaceColor	= [255 181 181]/255;
+%fill.FaceAlpha	= 0.2;
+
+plot( PackTemp_sm, 'LineWidth', 2 );
 plot([race_start_time race_end_time], [pack_derating_ramp pack_derating_ramp], 'r');
 
 ax2.YTick = pack_derating_ramp + (0:0.2:1).*(pack_derating_cutoff - pack_derating_ramp);
-ax2.YTickLabel = {'100%', '80%', '60%', '40%', '20%', '0%'};
+%ax2.YTickLabel = {'100%', '80%', '60%', '40%', '20%', '0%'};
+
+title('Battery pack temperature');
+
+ylabel( 'Battery power derating' );
+xlim([0 race_end_time]);
+xlabel('');
 
 % Controller temp
 ax3 = subplot(313); hold on;
-grid on;
-title('Motor controller temperature');
-plot(Powertrain.Controller.IPMPhaseATemp);
-ylabel('
+h = area(times, normalized, 'LineStyle', 'none');
+ylim([0 1]);
+xlim([ race_start_time, race_end_time ]);
 
-linkaxes([ax1 ax2 ax3], 'x');
-xlim([race_start_time race_end_time]);
+set(gca, 'ytick', []);		% Hide y-axis
+xlabel('Race time (sec)');
 
+% Pretty colors
+h(1).FaceColor		= [110 235 131]/255;	% throttle = light green
+h(1).DisplayName	= 'Throttle position';
+
+h(2).FaceColor		= [254 95  85 ]/255;	% motor/controller temp = red
+h(2).DisplayName	= 'Motor/MC temperature';
+
+h(3).FaceColor		= [255 210 63]/255;		% battery temp = orange
+h(3).DisplayName	= 'Battery temperature';
+
+h(4).FaceColor		= [008 061 119]/255;	% PWM = dk blue
+h(4).DisplayName	= 'DC bus voltage (PWM)';
+
+h(5).FaceColor		= [27  231 255]/255;	% lower bus voltage = blue
+h(5).DisplayName	= 'Lower bus voltage limit';
+
+h(6).FaceColor		= [228 255 026]/255;	% upper bus voltage = yellow
+h(6).DisplayName	= 'Upper bus voltage limit';
+
+legend('show', 'Location', 'southoutside', 'Orientation', 'horizontal');
+
+
+
+% Modifications for presentation
+ax1.XTick		= [];
+ax2.XTick		= [];
+ax3.XTick		= [];
+
+ax2.YTick = pack_derating_ramp + (0:0.25:1).*(pack_derating_cutoff - pack_derating_ramp);
+ax2.YTickLabel	= {'100%', '', '50%', '', '0%'};
+legend('hide')
+
+axes(ax1);
+title('');
+
+axes(ax2);
+title('');
+
+axes(ax3);
+title('');
+
+%title(	'Battery pack temperature',		...
+%		'FontName', 'Helvetica Neue',	...
+%		'FontSize', 20					);
+
+% This will only work on Aaron's computer
+save_figure('PPIHC_limits', [8 12]);
 
 
