@@ -14,7 +14,7 @@ race_end_time		= 847.1;	% note: this is not perfectly precise
 
 % Gearing correction factor
 % [correct geared wheel diameter] = [wheel diameter programmed during race] * [gearing correction factor]
-gear_correction		= 23/38;
+gear_correction		= 21/38;
 
 
 %% Load input file and offset all time vectors
