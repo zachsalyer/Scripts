@@ -55,23 +55,23 @@ for col=[1,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,2
     end
 end
 
-% Convert the contents of columns with dates to MATLAB datetimes using date
-% format string.
-try
-    dates{2} = datetime(dataArray{2}, 'Format', 'HH:mm:ss', 'InputFormat', 'HH:mm:ss');
-catch
-    try
-        % Handle dates surrounded by quotes
-        dataArray{2} = cellfun(@(x) x(2:end-1), dataArray{2}, 'UniformOutput', false);
-        dates{2} = datetime(dataArray{2}, 'Format', 'HH:mm:ss', 'InputFormat', 'HH:mm:ss');
-    catch
-        dates{2} = repmat(datetime([NaN NaN NaN]), size(dataArray{2}));
-    end
-end
+% % Convert the contents of columns with dates to MATLAB datetimes using date
+% % format string.
+% try
+%     dates{2} = datetime(dataArray{2}, 'Format', 'HH:mm:ss', 'InputFormat', 'HH:mm:ss');
+% catch
+%     try
+%         % Handle dates surrounded by quotes
+%         dataArray{2} = cellfun(@(x) x(2:end-1), dataArray{2}, 'UniformOutput', false);
+%         dates{2} = datetime(dataArray{2}, 'Format', 'HH:mm:ss', 'InputFormat', 'HH:mm:ss');
+%     catch
+%         dates{2} = repmat(datetime([NaN NaN NaN]), size(dataArray{2}));
+%     end
+% end
 
-anyBlankDates = cellfun(@isempty, dataArray{2});
-anyInvalidDates = isnan(dates{2}.Hour) - anyBlankDates;
-dates = dates(:,2);
+% anyBlankDates = cellfun(@isempty, dataArray{2});
+% anyInvalidDates = isnan(dates{2}.Hour) - anyBlankDates;
+% dates = dates(:,2);
 
 %% Split data into numeric and cell columns.
 rawNumericColumns = raw(:, [1,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]);

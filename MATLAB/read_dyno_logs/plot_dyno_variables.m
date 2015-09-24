@@ -96,3 +96,76 @@ plot(Id, 'r');
 plot(Iq);
 
 linkaxes([ax1, ax2], 'x');
+
+%% Shaft speed, dyno torque, efficiencies
+
+figure(3)
+clf
+
+% Shaft speed
+% motor speed
+ax1 = subplot(311);
+hold on;
+plot( kvaserMap('MotorVelocit').ts , 'LineWidth', 1.5);
+xlim([0 150]);
+ylabel( 'Shaft speed (RPM)' );
+grid on;
+hold off;
+title( 'Shaft speed' );
+
+%FIXME: Timeseries plotted while the plot is held do not automatically
+%scale axes to StartDate
+ax2 = subplot(312);
+hold on;
+plot(dynoTorque, 'r', 'LineWidth', 1.5);
+plot(kvaserMap('Rail3V').ts, 'w');
+ylabel('Dynamometer torque measurement (N m)');
+grid on;
+hold off;
+title('Dynamometer torque');
+
+ax3 = subplot(313);
+% Calculate powers
+DynoPower = dynoTorque .* (dynoRPM/60*2*pi);
+
+% The timeseries data vectors will be different lengths if the log was
+% truncated when one was received but not the other. Synchronize 
+
+Id	= kvaserMap('Id').ts;
+Iq	= kvaserMap('Iq').ts;
+Vd	= kvaserMap('Vd').ts;
+Vq	= kvaserMap('Vq').ts;
+
+[Id Iq] = synchronize(Id, Iq, 'Union');
+[Id Vq] = synchronize(Id, Vq, 'Union');
+[Id Vd] = synchronize(Id, Vd, 'Union');
+[Iq Vq] = synchronize(Iq, Vq, 'Union');
+[Iq Vd] = synchronize(Iq, Vd, 'Union');
+[Vd Vq] = synchronize(Vd, Vq, 'Union');
+
+%MotorPower = Id;
+%MotorCurrent = sqrt(Id.Data.^2 + Iq.Data.^2);
+%MotorVoltage = sqrt(Vd.Data.^2 + Vq.Data.^2);
+%MotorPower.Data = MotorCurrent .* MotorVoltage;
+
+MotorPower = (3/2)*(Vd*Id + Vq*Iq);
+
+BusPower = kvaserMap('BusCurrent').ts .* kvaserMap('BusVoltage').ts;
+
+[BusPower MotorPower]	= synchronize(BusPower, MotorPower, 'Union');
+[BusPower DynoPower]	= synchronize(BusPower, DynoPower, 'Union');
+[DynoPower MotorPower]	= synchronize(DynoPower, MotorPower, 'Union');
+
+hold on;
+plot(BusPower/1000, 'LineWidth', 1.5);
+plot(MotorPower/1000, 'g', 'LineWidth', 1.5);
+plot(DynoPower/1000, 'r', 'LineWidth', 1.5);
+ylabel('Power (kW)');
+xlabel('Time (sec)');
+grid on;
+
+legend('Bus power', 'Motor power', 'Dyno power');
+hold off;
+title('Measured power');
+
+linkaxes([ax1 ax2 ax3], 'x');
