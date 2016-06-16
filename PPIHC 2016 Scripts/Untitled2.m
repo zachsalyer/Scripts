@@ -11,7 +11,7 @@ variables	= {temp.name};
 
 in			= load(filename);
 
-for t = 1:.1:length(in.VelocityMeas_107_MotorVelocit_00.signals.values)
+for t = 1:1:length(in.VelocityMeas_107_MotorVelocit_00.signals.values)
     if in.VelocityMeas_107_MotorVelocit_00.signals.values(t,:) > 0
        min_time = in.VelocityMeas_107_MotorVelocit_00.time(t); 
        break;
@@ -82,8 +82,12 @@ PA = timeseries(in.WS200MotorTe_113_IPMPhaseATem_00.signals.values, in.WS200Moto
 PB = timeseries(in.WS200DSPBoar_110_IPMPhaseBTem_01.signals.values, in.WS200DSPBoar_110_IPMPhaseBTem_01.time); 
 PC = timeseries(in.WS200PhaseCT_114_IMPPhaseCTem_00.signals.values, in.WS200PhaseCT_114_IMPPhaseCTem_00.time);
 Btemp = timeseries(in.WS200DSPBoar_110_DSPBoardTemp_00.signals.values, in.WS200DSPBoar_110_DSPBoardTemp_00.time);
-%Eflag = timeseries(in.WS200Status_116_ErrorFlags_01.signals.values
-%Lflag = timeseries(in.
+errorvector = de2bi(in.WS200Status_116_ErrorFlags_01.signals.values);
+Eflag = timeseries(errorvector, in.WS200Status_116_ErrorFlags_01.time); 
+limitvector = de2bi(in.WS200Status_116_LimitFlags_02.signals.values);
+LFlag = timeseries(limitvector, in.WS200Status_116_LimitFlags_02.time);
+
+
 
 
 %GPS
@@ -127,7 +131,7 @@ CoreData = struct('Powertrain', ...
                     'IPMPhaseCTemp', rs(PC), ...
                     'DSPBoardTemp', rs(Btemp), ...
                     'ErrorFlags', [], ...
-                    'LimitFlags', [])), ...
+                    'LimitFlags', LFlag)), ...
            'Vehicle', ...
                 struct('GPS', ...
                     struct('Longitude', rs(longitude), ...
@@ -143,6 +147,6 @@ CoreData = struct('Powertrain', ...
 RawData = in;
 
 save_file = input('Save file name as: ', 's');
-save(save_file, 'CoreData', 'RawData');
+save(save_file, 'CoreData', 'RawData', '-v7.3');
 
 
