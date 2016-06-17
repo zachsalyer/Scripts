@@ -158,7 +158,8 @@ CoreData = struct('Powertrain', ...
             
 RawData = in;
 
-save_file = input('Save file name as: ', 's');
-save(save_file, 'CoreData', 'RawData', '-v7.3');
-
+save_file = input('Save CoreData file name as: ', 's');
+save(save_file, 'CoreData', '-v7.3');
+save_file = input('Save RawData file name as: ', 's');
+save(save_file, 'RawData', '-v7.3');
 
