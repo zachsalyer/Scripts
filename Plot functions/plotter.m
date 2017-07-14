@@ -1,26 +1,18 @@
 %this script runs all of the available plotting functions
 close all;
-%GPS
-GPSPlot(CoreData)
-%limit flags vs time
-LimitPlot(CoreData)
-%cell temp limit vs time
-CellLimPlot(CoreData)
-%cell voltages
-CellVoltPlot(CoreData)
-%cell temperatures
-CellTempPlot(CoreData)
+
+
 %motor cooling loop temps
-MotorCoolingPlot(CoreData)
+MotorCoolingPlot(data)
 %inverter cooling loop temps
-ControllerCoolingPlot(CoreData)
+ControllerCoolingPlot(data)
 %scatterplot of rpm vs torqe with lines for rider controls
-RPMvsTorquePlot(CoreData)
-%throttle vs actual current
-ThrottleCurrentComparePlot(CoreData)
+RPMvsTorquePlot(data)
 %vehicle speed calculator
-VelocityPlot(CoreData)
+VelocityPlot(data)
 %DC bus voltage and DC bus current
-DCVoltageCurrentPlot(CoreData)
+DCVoltageCurrentPlot(data)
 %DC bus power
-DCBusPowerPlot(CoreData)
+DCBusPowerPlot(data)
+%Cell temperature
+CellTempPlot(data)

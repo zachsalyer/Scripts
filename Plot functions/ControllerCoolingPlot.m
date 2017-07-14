@@ -8,18 +8,19 @@ function [ output_args ] = ControllerCoolingPlot( CoreData, fig )
 if ~exist('fig')
     f=figure;
 else
-    f=figure(fig)
+    f=figure(fig);
 end;
 
 set(gcf,'color','w'); set(gca,'fontsize',16); hold on;
 set(f,'name','Controller Cooling Temperatures','numbertitle','off')
-plot(CoreData.Powertrain.Cooling.InverterInletTemp,'LineWidth',2);
-plot(CoreData.Powertrain.Cooling.InverterOutletTemp,'LineWidth',2);
-plot(CoreData.Powertrain.Inverter.DSPBoardTemp,'LineWidth',2);
-plot(CoreData.Powertrain.Inverter.IPMPhaseATemp,'LineWidth',2);
-plot(CoreData.Powertrain.Inverter.IPMPhaseBTemp,'LineWidth',2);
-plot(CoreData.Powertrain.Inverter.IPMPhaseCTemp,'LineWidth',2);
-h=legend('Controller Inlet Temp', 'Controller Outlet Temp', 'Controller DSP Board Temp', 'Controller Phase A Temp', 'Controller Phase B Temp','Controller Phase C Temp');
+plot(CoreData.time,CoreData.Controller_Inlet_Temperature_fiC,'LineWidth',2);
+plot(CoreData.time,CoreData.Controller_Outlet_Temperature_fiC,'LineWidth',2);
+plot(CoreData.time,CoreData.D1_Control_Board_TemperatureC,'LineWidth',2);
+plot(CoreData.time,CoreData.D1_Module_AC,'LineWidth',2);
+plot(CoreData.time,CoreData.D2_Module_BC,'LineWidth',2);
+plot(CoreData.time,CoreData.D3_Module_CC,'LineWidth',2);
+plot(CoreData.time,CoreData.D4_Gate_Driver_BoardC,'LineWidth',2);
+h=legend('Controller Inlet Temp', 'Controller Outlet Temp', 'Control Board Temp', 'Controller Module A Temp', 'Controller Module B Temp','Controller Module C Temp','Gate Driver Board Temp');
 set(h,'FontSize',10);
 xlabel('Time [s]');
 ylabel('Temperature [^{\circ}C]');

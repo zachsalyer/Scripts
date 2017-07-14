@@ -7,16 +7,19 @@ function [ output_args ] = VelocityPlot( CoreData, fig )
 if ~exist('fig')
     f=figure;
 else
-    f=figure(fig)
+    f=figure(fig);
 end;
 
 set(gcf,'color','w'); set(gca,'fontsize',16); hold on;
 set(f,'name','Vehicle Speed','numbertitle','off');
-gearing=51/23;
+gearing=58/21;
 wheel_circ=2.082; %m
-mps=CoreData.Powertrain.Motor.MotorVelocity.data/gearing*wheel_circ/60;
+mps=-CoreData.D2_Motor_Speedrpm/gearing*wheel_circ/60;
 mph=mps*2.237;
-plot(CoreData.Powertrain.Motor.MotorVelocity.time, mph,'LineWidth',2);
+plot(CoreData.time, mph,'LineWidth',2);
+%plot(CoreData.Vehicle.GPS.GPSVelocity);
+%h=legend('Calculated Speed', 'GPS Speed');
+%set(h,'FontSize',10);
 xlabel('Time [s]');
 ylabel('Vehicle Speed [mph]');
 title('Vehicle Speed vs Time');

@@ -7,15 +7,15 @@ function [ output_args ] = MotorCoolingPlot( CoreData, fig )
 if ~exist('fig')
     f=figure;
 else
-    f=figure(fig)
+    f=figure(fig);
 end;
 
 set(gcf,'color','w'); set(gca,'fontsize',16)
 set(f,'name','Motor Cooling Temperatures','numbertitle','off')
 hold on;
-plot(CoreData.Powertrain.Cooling.MotorInletTemp,'LineWidth',2);
-plot(CoreData.Powertrain.Cooling.MotorOutletTemp,'LineWidth',2);
-plot(CoreData.Powertrain.Motor.MotorTemp,'LineWidth',2);
+plot(CoreData.time,CoreData.Motor_Inlet_Temperature_fiC,'LineWidth',2);
+plot(CoreData.time,CoreData.Motor_Outlet_Temperature_fiC,'LineWidth',2);
+plot(CoreData.time,CoreData.D3_Motor_TemperatureC,'LineWidth',2);
 h=legend('Motor Inlet Temp', 'Motor Outlet Temp', 'Motor Temp');
 set(h,'FontSize',10);
 xlabel('Time [s]');
