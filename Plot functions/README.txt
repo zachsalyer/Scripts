@@ -5,3 +5,5 @@ To use the plot functions:
 - Run the 'plotter.m' script
 
 Individual function documentation can be found in the comments of each function. 
+
+Note that proper formatting of plots for these particular scripts requires MATLAB 2014b or newer. 
