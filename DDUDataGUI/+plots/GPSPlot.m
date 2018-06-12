@@ -3,15 +3,9 @@ function [  ] = GPSPlot(CoreData, fig)
 %plot. CoreData is the input file containing the run data, fig is an
 %optional parameter of a figure handle for the plot to be made on. 
 
-if ~exist('fig')
-    f=figure;
-else
-    f=figure(fig)
-end;
-
 set(gcf,'color','w'); set(gca,'fontsize',16); hold on;
-set(f,'name','GPS','numbertitle','off')
-plot3(CoreData.Vehicle.GPS.Longitude.Data, CoreData.Vehicle.GPS.Latitude.Data, CoreData.Vehicle.GPS.Altitude.Data,'LineWidth',2);
+%set(f,'name','GPS','numbertitle','off')
+plot3(CoreData.Vehicle.GPS.Longitude, CoreData.Vehicle.GPS.Latitude, CoreData.Vehicle.GPS.Altitude,'LineWidth',2);
 xlabel('Longitude');
 ylabel('Latitude');
 zlabel('Altitude');
