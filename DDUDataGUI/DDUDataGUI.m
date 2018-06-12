@@ -91,29 +91,36 @@ cla;
 popup_sel_index = get(handles.popupmenu1, 'Value');
 switch popup_sel_index
     case 1
-        plots.CellLimPlot(handles.data)
+        cla(handles.axes1,'reset')
+        plots.CellTempPlot(handles.data.CoreData)
     case 2
-        plots.CellTempPlot(handles.data)
+        cla(handles.axes1,'reset')
+        waitfor(msgbox('Cell Volt Plot needs reworked.'));
+        %plots.CellVoltPlot(handles.data.CoreData)
     case 3
-        plots.CellVoltPlot(handles.data)
+        cla(handles.axes1,'reset')
+        plots.ControllerCoolingPlot(handles.data.CoreData)
     case 4
-        plots.ControllerCoolingPlot(handles.data)
+        cla(handles.axes1,'reset')
+        plots.DCBusPowerPlot(handles.data.CoreData)
     case 5
-        plots.DCBusPowerPlot(handles.data)
+        cla(handles.axes1,'reset')
+        plots.DCVoltageCurrentPlot(handles.data.CoreData)
     case 6
-        plots.DCVoltageCurrentPlot(handles.data)
+        cla(handles.axes1,'reset')
+        plots.GPSPlot(handles.data.CoreData)
     case 7
-        plots.GPSPlot(handles.data)
+        cla(handles.axes1,'reset')
+        plots.MotorCoolingPlot(handles.data.CoreData)
     case 8
-        plots.LimitPlot(handles.data)
+        cla(handles.axes1,'reset')
+        plots.RPMvsTorquePlot(handles.data.CoreData)
     case 9
-        plots.MotorCoolingPlot(handles.data)
+        cla(handles.axes1,'reset')
+        plots.ThrottleCurrentComparePlot(handles.data.CoreData)
     case 10
-        plots.RPMvsTorquePlot(handles.data)
-    case 11
-        plots.ThrottleCurrentComparePlot(handles.data)
-    case 12
-        plots.VelocityPlot(handles.data)
+        cla(handles.axes1,'reset')
+        plots.VelocityPlot(handles.data.CoreData)
 end
 
 
@@ -178,4 +185,4 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
      set(hObject,'BackgroundColor','white');
 end
 
-set(hObject, 'String', {'Cell Lim', 'Cell Temp', 'Cell Volt', 'Controller Cooling', 'DC Bus Power', 'DC Voltage & Current', 'GPS', 'Limits', 'Motor Cooling', 'RPM vs Torque', 'Throttle - Current Comparison', 'Velocity'});
+set(hObject, 'String', {'Cell Temp', 'Cell Volt', 'Controller Cooling', 'DC Bus Power', 'DC Voltage & Current', 'GPS', 'Motor Cooling', 'RPM vs Torque', 'Throttle - Current Comparison', 'Velocity'});

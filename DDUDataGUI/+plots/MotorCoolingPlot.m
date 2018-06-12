@@ -13,9 +13,9 @@ function [ output_args ] = MotorCoolingPlot( CoreData )
 set(gcf,'color','w'); set(gca,'fontsize',16)
 %set(f,'name','Motor Cooling Temperatures','numbertitle','off')
 hold on;
-plot(CoreData.CoreData.Powertrain.Cooling.MotorLoopInletTempFiltered,'LineWidth',2);
-plot(CoreData.CoreData.Powertrain.Cooling.MotorLoopOutletTempFiltered,'LineWidth',2);
-plot(CoreData.CoreData.Powertrain.Cooling.MotorTemp,'LineWidth',2);
+plot(CoreData.Powertrain.Cooling.MotorLoopInletTempFiltered,'LineWidth',2);
+plot(CoreData.Powertrain.Cooling.MotorLoopOutletTempFiltered,'LineWidth',2);
+plot(CoreData.Powertrain.Cooling.MotorTemp,'LineWidth',2);
 h=legend('Motor Inlet Temp', 'Motor Outlet Temp', 'Motor Temp');
 set(h,'FontSize',10);
 xlabel('Time [s]');
